@@ -12,7 +12,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/jpeg" href="assets/profile.jpg">
 
-  <!-- Google Font for Heading (Bold Serif matching Telegram title styling) -->
+  <!-- Google Font for Heading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
@@ -23,11 +23,11 @@
 <body>
 
   <!-- ======================================================================
-       1. TIMER SCREEN (3-SECOND COUNTDOWN)
-       Displays photo, bold heading, 3s countdown, and disclaimer.
+       1. TIMER SCREEN (1.5-SECOND COUNTDOWN)
+       Displays photo, bold heading, 1.5s countdown, and disclaimer.
        ====================================================================== -->
   <div id="timerScreen" class="timer-screen" role="status" aria-live="polite">
-    <div class="timer-card">
+    <div class="timer-card" id="timerCard">
       <div class="timer-avatar-container">
         <img 
           src="assets/profile.jpg" 
@@ -48,10 +48,10 @@
 
       <!-- Countdown Box -->
       <div class="timer-countdown-box">
-        <span id="countdownNumber" class="countdown-digit">3</span>
+        <span id="countdownNumber" class="countdown-digit">1</span>
       </div>
 
-      <p class="timer-subtext">Opening page in <span id="timerSecondsText">3</span> seconds...</p>
+      <p class="timer-subtext">Opening page in <span id="timerSecondsText">1.5</span> seconds...</p>
 
       <div class="timer-progress-track">
         <div id="timerProgressBar" class="timer-progress-fill"></div>
@@ -84,12 +84,17 @@
       x5-video-player-fullscreen="true"
       disablePictureInPicture
       controlsList="nodownload noplaybackrate nofullscreen"
-      autoplay
       preload="auto"
     ></video>
 
-    <!-- Tap Area Over Video: unmutes or opens Telegram link -->
-    <div id="videoTapOverlay" class="video-tap-overlay" aria-label="Join Telegram channel"></div>
+    <!-- Tap Area Over Video to ensure unmuting on tap without unwanted redirect -->
+    <div id="videoTapOverlay" class="video-tap-overlay" aria-label="Tap to unmute sound"></div>
+
+    <!-- Floating Sound Status Indicator (Only appears if browser blocks initial sound before touch) -->
+    <div id="soundIndicator" class="sound-indicator" style="display: none;">
+      <span class="sound-indicator-icon">🔊</span>
+      <span class="sound-indicator-text">Tap anywhere for sound</span>
+    </div>
 
     <!-- Top Floating Telegram Header Overlay -->
     <header class="video-top-overlay">
@@ -127,14 +132,14 @@
 
   <!-- ======================================================================
        AUTOMATION SCRIPT:
-       1. 3-second countdown timer
-       2. Video auto-play with audio always enabled
+       1. 1.5-second countdown timer
+       2. Robust audio unlock & unmuted video playback
        3. Fullscreen video covering entire screen
        4. Auto-redirect on video completion to Telegram link
-       5. Direct navigation on button/screen tap
+       5. Direct navigation on JOIN CHANNEL button
        ====================================================================== -->
   <script>
-    const COUNTDOWN_SECONDS = 3;
+    const COUNTDOWN_SECONDS = 1.5;
     const TELEGRAM_URL = 'https://t.me/+Gy66WGS85nc4Yzhl';
 
     (function() {
@@ -142,78 +147,91 @@
       const videoScreen = document.getElementById('videoScreen');
       const promoVideo = document.getElementById('promoVideo');
       const videoTapOverlay = document.getElementById('videoTapOverlay');
+      const soundIndicator = document.getElementById('soundIndicator');
       const countdownNumber = document.getElementById('countdownNumber');
       const timerSecondsText = document.getElementById('timerSecondsText');
       const timerProgressBar = document.getElementById('timerProgressBar');
       const timerSvgCircle = document.getElementById('timerSvgCircle');
       const skipBtn = document.getElementById('skipTimerBtn');
 
-      let remaining = COUNTDOWN_SECONDS;
       let hasOpened = false;
-      const circumference = 2 * Math.PI * 44; // ~276.46px for radius=44
+      let audioUnlocked = false;
+      const circumference = 2 * Math.PI * 44;
 
       if (timerSvgCircle) {
         timerSvgCircle.style.strokeDasharray = circumference;
         timerSvgCircle.style.strokeDashoffset = '0';
       }
 
-      // Early sound unlock: any gesture anywhere on screen unlocks audio
-      function unlockAudio() {
-        if (promoVideo) {
-          promoVideo.muted = false;
-          promoVideo.volume = 1.0;
+      // Master audio unlock function
+      function enableAudioPlayback() {
+        if (!promoVideo) return;
+        promoVideo.muted = false;
+        promoVideo.volume = 1.0;
+        audioUnlocked = true;
+
+        if (soundIndicator) {
+          soundIndicator.style.display = 'none';
+        }
+
+        const p = promoVideo.play();
+        if (p !== undefined) {
+          p.catch(function(err) {
+            console.log("Audio play attempt:", err);
+          });
         }
       }
-      ['click', 'touchstart', 'touchend', 'pointerdown', 'keydown'].forEach(function(evt) {
-        window.addEventListener(evt, unlockAudio, { capture: true, once: true });
-        document.addEventListener(evt, unlockAudio, { capture: true, once: true });
+
+      // Listen for early gestures anywhere on page
+      ['touchstart', 'touchend', 'click', 'pointerdown', 'mousedown', 'keydown'].forEach(function(evt) {
+        window.addEventListener(evt, enableAudioPlayback, { passive: true });
+        document.addEventListener(evt, enableAudioPlayback, { passive: true });
       });
 
-      function startVideoPlayback() {
+      function startVideo() {
         if (!promoVideo) return;
 
-        // Sound of the video should always be enabled
+        // Try playing unmuted first
         promoVideo.muted = false;
         promoVideo.volume = 1.0;
 
         const playPromise = promoVideo.play();
         if (playPromise !== undefined) {
-          playPromise.catch(function(err) {
-            // If browser blocks unmuted playback before direct user interaction:
-            // Play immediately and unmute on the very first touch/click
+          playPromise.then(function() {
+            audioUnlocked = true;
+            if (soundIndicator) soundIndicator.style.display = 'none';
+          }).catch(function(err) {
+            // Autoplay with audio was restricted by browser policy before user interaction
             promoVideo.muted = true;
-            promoVideo.play().then(function() {
-              const unmuteOnInteraction = function() {
-                promoVideo.muted = false;
-                promoVideo.volume = 1.0;
-                ['click', 'touchstart', 'touchend', 'pointerdown'].forEach(function(eName) {
-                  document.removeEventListener(eName, unmuteOnInteraction, true);
-                  window.removeEventListener(eName, unmuteOnInteraction, true);
-                });
-              };
-              ['click', 'touchstart', 'touchend', 'pointerdown'].forEach(function(eName) {
-                document.addEventListener(eName, unmuteOnInteraction, { capture: true, once: true });
-                window.addEventListener(eName, unmuteOnInteraction, { capture: true, once: true });
-              });
-            }).catch(function() {});
+            promoVideo.play().catch(function() {});
+
+            // Display sound indicator so user knows to tap
+            if (soundIndicator && !audioUnlocked) {
+              soundIndicator.style.display = 'inline-flex';
+            }
           });
         }
 
-        // Tapping the video screen
-        function handleVideoTap(e) {
-          if (promoVideo.muted) {
-            promoVideo.muted = false;
-            promoVideo.volume = 1.0;
-          } else {
-            window.open(TELEGRAM_URL, '_blank');
+        // Tapping the video screen or overlay un-mutes immediately without navigating away
+        function tapToUnmute(e) {
+          if (promoVideo.muted || !audioUnlocked) {
+            e.stopPropagation();
+            enableAudioPlayback();
           }
         }
 
         if (videoTapOverlay) {
-          videoTapOverlay.addEventListener('click', handleVideoTap);
+          videoTapOverlay.addEventListener('click', tapToUnmute);
+          videoTapOverlay.addEventListener('touchstart', tapToUnmute, { passive: true });
         }
 
-        promoVideo.addEventListener('click', handleVideoTap);
+        if (soundIndicator) {
+          soundIndicator.addEventListener('click', tapToUnmute);
+          soundIndicator.addEventListener('touchstart', tapToUnmute, { passive: true });
+        }
+
+        promoVideo.addEventListener('click', tapToUnmute);
+        promoVideo.addEventListener('touchstart', tapToUnmute, { passive: true });
 
         // Redirect to Telegram when video ends
         promoVideo.addEventListener('ended', function() {
@@ -237,19 +255,26 @@
           videoScreen.classList.add('video-screen-visible');
         }
 
-        // Start video playback immediately with sound
-        startVideoPlayback();
+        startVideo();
       }
 
-      // Allow skip immediately
+      // Allow skip button to trigger video immediately with sound
       if (skipBtn) {
-        skipBtn.addEventListener('click', function() {
-          unlockAudio();
+        skipBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          enableAudioPlayback();
           openFullscreenVideo();
         });
       }
 
-      // Start circular SVG ring and progress bar animations for 3 seconds
+      // Tapping anywhere on the timer screen also unlocks audio
+      if (timerScreen) {
+        timerScreen.addEventListener('click', function() {
+          enableAudioPlayback();
+        });
+      }
+
+      // Start circular SVG ring and progress bar animations for 1.5 seconds
       requestAnimationFrame(function() {
         if (timerProgressBar) {
           timerProgressBar.style.transition = 'width ' + COUNTDOWN_SECONDS + 's linear';
@@ -262,18 +287,26 @@
         }
       });
 
-      // 3-second countdown interval
+      // 1.5-second countdown logic
+      const startTime = Date.now();
+      const durationMs = COUNTDOWN_SECONDS * 1000;
+
       const interval = setInterval(function() {
-        remaining -= 1;
-        if (remaining > 0) {
+        const elapsed = Date.now() - startTime;
+        const leftSec = Math.max(0, (durationMs - elapsed) / 1000);
+
+        if (leftSec > 0.05) {
           if (countdownNumber) {
-            countdownNumber.textContent = remaining;
-            countdownNumber.classList.remove('pulse');
-            void countdownNumber.offsetWidth;
-            countdownNumber.classList.add('pulse');
+            const displayVal = Math.ceil(leftSec);
+            if (countdownNumber.textContent !== String(displayVal)) {
+              countdownNumber.textContent = displayVal;
+              countdownNumber.classList.remove('pulse');
+              void countdownNumber.offsetWidth;
+              countdownNumber.classList.add('pulse');
+            }
           }
           if (timerSecondsText) {
-            timerSecondsText.textContent = remaining;
+            timerSecondsText.textContent = leftSec.toFixed(1);
           }
         } else {
           clearInterval(interval);
@@ -281,7 +314,7 @@
           if (timerSecondsText) timerSecondsText.textContent = '0';
           openFullscreenVideo();
         }
-      }, 1000);
+      }, 100);
     })();
   </script>
 
