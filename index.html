@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SURAJ BHAI - Telegram Channel</title>
-  <meta name="description" content="Join SURAJ BHAI on Telegram. PLAY CAREFULLY AND MAINTAIN YOUR LEVEL. ALWAYS FOR PROFITS. REGISTER LINK HERE.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0e0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>BITTU BHAI NUMBER PRIDICTION - Telegram Channel</title>
+  <meta name="description" content="Join BITTU BHAI NUMBER PRIDICTION on Telegram. Earn With Dominators | VIP Signals. Baccarat Tips & Strategy.">
 
   <!-- Favicon -->
   <link rel="icon" type="image/jpeg" href="assets/profile.jpg">
@@ -20,18 +23,18 @@
 <body>
 
   <!-- ======================================================================
-       1. TIMER SCREEN (1-SECOND COUNTDOWN BEFORE HOME PAGE)
-       Displays for 1 second upon page load, then reveals the home page card.
+       1. TIMER SCREEN (3-SECOND COUNTDOWN)
+       Displays photo, bold heading, 3s countdown, and disclaimer.
        ====================================================================== -->
   <div id="timerScreen" class="timer-screen" role="status" aria-live="polite">
     <div class="timer-card">
       <div class="timer-avatar-container">
         <img 
           src="assets/profile.jpg" 
-          alt="SURAJ BHAI Avatar" 
+          alt="BITTU BHAI" 
           class="timer-avatar" 
-          width="76" 
-          height="76"
+          width="74" 
+          height="74"
           loading="eager"
         >
         <svg class="timer-svg" viewBox="0 0 100 100" aria-hidden="true">
@@ -40,17 +43,22 @@
         </svg>
       </div>
 
-      <h2 class="timer-channel-title">SURAJ BHAI</h2>
+      <!-- Bold Text -->
+      <h2 class="timer-bold-title">JOIN OUR PROFITABLE CHANNEL NOW</h2>
 
+      <!-- Countdown Box -->
       <div class="timer-countdown-box">
-        <span id="countdownNumber" class="countdown-digit">1</span>
+        <span id="countdownNumber" class="countdown-digit">3</span>
       </div>
 
-      <p class="timer-subtext">Opening page in <span id="timerSecondsText">1</span> second...</p>
+      <p class="timer-subtext">Opening page in <span id="timerSecondsText">3</span> seconds...</p>
 
       <div class="timer-progress-track">
         <div id="timerProgressBar" class="timer-progress-fill"></div>
       </div>
+
+      <!-- Small Disclaimer Text -->
+      <p class="timer-disclaimer">It's only for entainment purpose I will not engage in any financial losses.</p>
 
       <button id="skipTimerBtn" class="timer-skip-btn" type="button" aria-label="Skip timer and open immediately">
         Skip &rarr;
@@ -59,64 +67,81 @@
   </div>
 
   <!-- ======================================================================
-       2. HOME PAGE (TELEGRAM CHANNEL PREVIEW CARD)
-       Revealed automatically after the 3-second timer completes.
-
-       CONFIGURATION (EASY TO UPDATE):
-       - Profile Image: Update src in <img class="profile-avatar">
-       - Name: Update text inside <h1 class="channel-name">
-       - Subscriber Count: Update text inside <p class="channel-subscribers">
-       - Description: Update lines inside <div class="channel-description">
-       - Telegram Link: Update href in <a class="btn-join">
+       2. FULLSCREEN VIDEO SCREEN (COVERS ENTIRE SCREEN AFTER TIMER)
+       Plays automatically with sound enabled. Overlaid with Telegram CTA & channel info.
        ====================================================================== -->
-  <main id="homeCard" class="channel-card home-card-hidden">
+  <main id="videoScreen" class="fullscreen-video-container video-screen-hidden">
 
-    <!-- 1. Profile Photo -->
-    <img 
-      src="assets/profile.jpg" 
-      alt="SURAJ BHAI Profile Photo" 
-      class="profile-avatar"
-      width="136"
-      height="136"
-      loading="eager"
-    >
+    <!-- Fullscreen Video Covering 100% of the Screen -->
+    <video 
+      id="promoVideo" 
+      class="fullscreen-video" 
+      src="assets/video.mp4" 
+      playsinline 
+      webkit-playsinline
+      x5-playsinline
+      x5-video-player-type="h5-page"
+      x5-video-player-fullscreen="true"
+      disablePictureInPicture
+      controlsList="nodownload noplaybackrate nofullscreen"
+      autoplay
+      preload="auto"
+    ></video>
 
-    <!-- 2. Client Name -->
-    <h1 class="channel-name">SURAJ BHAI</h1>
+    <!-- Tap Area Over Video: unmutes or opens Telegram link -->
+    <div id="videoTapOverlay" class="video-tap-overlay" aria-label="Join Telegram channel"></div>
 
-    <!-- 3. Subscriber Count -->
-    <p class="channel-subscribers">20 177 subscribers</p>
+    <!-- Top Floating Telegram Header Overlay -->
+    <header class="video-top-overlay">
+      <a href="https://t.me/+Gy66WGS85nc4Yzhl" class="video-channel-pill" target="_blank" rel="noopener noreferrer">
+        <img 
+          src="assets/profile.jpg" 
+          alt="BITTU BHAI" 
+          class="video-header-avatar"
+          width="42"
+          height="42"
+        >
+        <div class="video-header-meta">
+          <span class="video-header-title">BITTU BHAI NUMBER PRIDICTION</span>
+          <span class="video-header-subs">41 288 subscribers &bull; VIP Signals</span>
+        </div>
+      </a>
+    </header>
 
-    <!-- 4. Channel Description -->
-    <div class="channel-description">
-      <p>PLAY CAREFULLY AND MAINTAIN YOUR LEVEL</p>
-      <p>ALWAYS FOR PROFITS 🔥</p>
-      <p>REGISTER LINK HERE 🔥 ✨</p>
-      <p class="description-dots">...</p>
+    <!-- Bottom Floating CTA Overlay -->
+    <div class="video-bottom-overlay">
+      <a 
+        id="joinChannelBtn"
+        href="https://t.me/+Gy66WGS85nc4Yzhl" 
+        class="btn-join" 
+        target="_blank" 
+        rel="noopener noreferrer"
+      >
+        JOIN CHANNEL
+      </a>
+
+      <p class="video-disclaimer">It's only for entainment purpose I will not engage in any financial losses.</p>
     </div>
-
-    <!-- 5. Join Channel Button -->
-    <a 
-      href="https://t.me/+ycyTTk1Skik2MDg1" 
-      class="btn-join" 
-      target="_blank" 
-      rel="noopener noreferrer"
-    >
-      JOIN CHANNEL
-    </a>
 
   </main>
 
   <!-- ======================================================================
-       TIMER SCRIPT (Configurable 1-Second Countdown)
+       AUTOMATION SCRIPT:
+       1. 3-second countdown timer
+       2. Video auto-play with audio always enabled
+       3. Fullscreen video covering entire screen
+       4. Auto-redirect on video completion to Telegram link
+       5. Direct navigation on button/screen tap
        ====================================================================== -->
   <script>
-    // Configurable duration (in seconds)
-    const COUNTDOWN_SECONDS = 1;
+    const COUNTDOWN_SECONDS = 3;
+    const TELEGRAM_URL = 'https://t.me/+Gy66WGS85nc4Yzhl';
 
     (function() {
       const timerScreen = document.getElementById('timerScreen');
-      const homeCard = document.getElementById('homeCard');
+      const videoScreen = document.getElementById('videoScreen');
+      const promoVideo = document.getElementById('promoVideo');
+      const videoTapOverlay = document.getElementById('videoTapOverlay');
       const countdownNumber = document.getElementById('countdownNumber');
       const timerSecondsText = document.getElementById('timerSecondsText');
       const timerProgressBar = document.getElementById('timerProgressBar');
@@ -132,7 +157,71 @@
         timerSvgCircle.style.strokeDashoffset = '0';
       }
 
-      function openHomePage() {
+      // Early sound unlock: any gesture anywhere on screen unlocks audio
+      function unlockAudio() {
+        if (promoVideo) {
+          promoVideo.muted = false;
+          promoVideo.volume = 1.0;
+        }
+      }
+      ['click', 'touchstart', 'touchend', 'pointerdown', 'keydown'].forEach(function(evt) {
+        window.addEventListener(evt, unlockAudio, { capture: true, once: true });
+        document.addEventListener(evt, unlockAudio, { capture: true, once: true });
+      });
+
+      function startVideoPlayback() {
+        if (!promoVideo) return;
+
+        // Sound of the video should always be enabled
+        promoVideo.muted = false;
+        promoVideo.volume = 1.0;
+
+        const playPromise = promoVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(function(err) {
+            // If browser blocks unmuted playback before direct user interaction:
+            // Play immediately and unmute on the very first touch/click
+            promoVideo.muted = true;
+            promoVideo.play().then(function() {
+              const unmuteOnInteraction = function() {
+                promoVideo.muted = false;
+                promoVideo.volume = 1.0;
+                ['click', 'touchstart', 'touchend', 'pointerdown'].forEach(function(eName) {
+                  document.removeEventListener(eName, unmuteOnInteraction, true);
+                  window.removeEventListener(eName, unmuteOnInteraction, true);
+                });
+              };
+              ['click', 'touchstart', 'touchend', 'pointerdown'].forEach(function(eName) {
+                document.addEventListener(eName, unmuteOnInteraction, { capture: true, once: true });
+                window.addEventListener(eName, unmuteOnInteraction, { capture: true, once: true });
+              });
+            }).catch(function() {});
+          });
+        }
+
+        // Tapping the video screen
+        function handleVideoTap(e) {
+          if (promoVideo.muted) {
+            promoVideo.muted = false;
+            promoVideo.volume = 1.0;
+          } else {
+            window.open(TELEGRAM_URL, '_blank');
+          }
+        }
+
+        if (videoTapOverlay) {
+          videoTapOverlay.addEventListener('click', handleVideoTap);
+        }
+
+        promoVideo.addEventListener('click', handleVideoTap);
+
+        // Redirect to Telegram when video ends
+        promoVideo.addEventListener('ended', function() {
+          window.location.href = TELEGRAM_URL;
+        });
+      }
+
+      function openFullscreenVideo() {
         if (hasOpened) return;
         hasOpened = true;
 
@@ -143,18 +232,24 @@
           }, 350);
         }
 
-        if (homeCard) {
-          homeCard.classList.remove('home-card-hidden');
-          homeCard.classList.add('home-card-visible');
+        if (videoScreen) {
+          videoScreen.classList.remove('video-screen-hidden');
+          videoScreen.classList.add('video-screen-visible');
         }
+
+        // Start video playback immediately with sound
+        startVideoPlayback();
       }
 
-      // Allow user to skip immediately if they click Skip
+      // Allow skip immediately
       if (skipBtn) {
-        skipBtn.addEventListener('click', openHomePage);
+        skipBtn.addEventListener('click', function() {
+          unlockAudio();
+          openFullscreenVideo();
+        });
       }
 
-      // Start circular SVG ring and progress bar animations
+      // Start circular SVG ring and progress bar animations for 3 seconds
       requestAnimationFrame(function() {
         if (timerProgressBar) {
           timerProgressBar.style.transition = 'width ' + COUNTDOWN_SECONDS + 's linear';
@@ -167,14 +262,14 @@
         }
       });
 
-      // 1-second interval to update displayed countdown digit
+      // 3-second countdown interval
       const interval = setInterval(function() {
         remaining -= 1;
         if (remaining > 0) {
           if (countdownNumber) {
             countdownNumber.textContent = remaining;
             countdownNumber.classList.remove('pulse');
-            void countdownNumber.offsetWidth; // retrigger pulse animation
+            void countdownNumber.offsetWidth;
             countdownNumber.classList.add('pulse');
           }
           if (timerSecondsText) {
@@ -184,7 +279,7 @@
           clearInterval(interval);
           if (countdownNumber) countdownNumber.textContent = '0';
           if (timerSecondsText) timerSecondsText.textContent = '0';
-          openHomePage();
+          openFullscreenVideo();
         }
       }, 1000);
     })();

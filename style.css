@@ -2,8 +2,11 @@
    Telegram Channel Landing Page Stylesheet
    - Minimal, lightweight, zero-dependency CSS
    - High-fidelity match to Telegram channel preview
-   - 3-second animated countdown screen before home page
-   - Fully responsive and centered for mobile, tablet, and desktop
+   - 3-second countdown screen before video reveal
+   - Fullscreen vertical video covering the entire screen
+   - Continuous audio playback with sound enabled
+   - Continuous popping CTA button overlaid on video
+   - Fully responsive for mobile, tablet, and desktop
    ========================================================================== */
 
 /* Design Tokens */
@@ -15,7 +18,7 @@
   --btn-blue: #229ed9;
   --btn-blue-hover: #1e8ec3;
   --btn-blue-active: #197eb0;
-  --btn-shadow: rgba(34, 158, 217, 0.28);
+  --btn-shadow: rgba(34, 158, 217, 0.35);
   --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
 }
@@ -33,7 +36,9 @@ html {
   font-size: 16px;
   width: 100%;
   max-width: 100%;
+  height: 100%;
   overflow-x: hidden;
+  overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -42,6 +47,7 @@ body {
   max-width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
+  height: 100%;
   background-color: var(--bg-color);
   background-image: url('assets/pattern.svg');
   background-repeat: repeat;
@@ -53,14 +59,15 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 36px 16px;
-  overflow-x: hidden;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* ==========================================================================
-   1. Timer / Countdown Screen (Initial 3 Seconds)
+   1. Timer / Countdown Screen (Initial 3-Second Screen)
    ========================================================================== */
 .timer-screen {
   position: fixed;
@@ -82,7 +89,7 @@ body {
   background-repeat: repeat;
   background-position: center top;
   background-size: 420px auto;
-  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease;
   overflow-y: auto;
 }
 
@@ -95,7 +102,7 @@ body {
 
 .timer-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 380px;
   background-color: var(--card-bg);
   border-radius: 18px;
   padding: 36px 24px 30px 24px;
@@ -103,26 +110,27 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
   margin: auto;
 }
 
 .timer-avatar-container {
   position: relative;
-  width: 88px;
-  height: 88px;
-  margin-bottom: 14px;
+  width: 90px;
+  height: 90px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .timer-avatar {
-  width: 72px;
-  height: 72px;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
   object-fit: cover;
   display: block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .timer-svg {
@@ -148,19 +156,22 @@ body {
   stroke-linecap: round;
 }
 
-.timer-channel-title {
+/* Bold text on timer screen */
+.timer-bold-title {
   font-family: var(--font-serif);
-  font-size: 1.35rem;
+  font-size: 1.18rem;
   font-weight: 800;
   color: #ffffff;
   margin-bottom: 14px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
+  line-height: 1.35;
+  padding: 0 4px;
 }
 
 .timer-countdown-box {
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: rgba(34, 158, 217, 0.12);
   border: 1.5px solid rgba(34, 158, 217, 0.35);
@@ -171,7 +182,7 @@ body {
 }
 
 .countdown-digit {
-  font-size: 1.8rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: var(--btn-blue);
   font-family: var(--font-sans);
@@ -183,29 +194,25 @@ body {
 }
 
 @keyframes pulseDigit {
-  0% {
-    transform: scale(1.22);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1.22); }
+  100% { transform: scale(1); }
 }
 
 .timer-subtext {
   font-size: 0.9rem;
   color: var(--text-secondary);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   font-weight: 400;
 }
 
 .timer-progress-track {
   width: 100%;
-  max-width: 240px;
+  max-width: 220px;
   height: 4px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   overflow: hidden;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .timer-progress-fill {
@@ -213,6 +220,15 @@ body {
   height: 100%;
   background: var(--btn-blue);
   border-radius: 999px;
+}
+
+.timer-disclaimer {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-top: 14px;
+  max-width: 320px;
+  opacity: 0.85;
 }
 
 .timer-skip-btn {
@@ -227,6 +243,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
+  margin-top: 14px;
 }
 
 .timer-skip-btn:hover {
@@ -241,135 +258,221 @@ body {
 }
 
 /* ==========================================================================
-   2. Home Page / Main Channel Preview Card
+   2. Fullscreen Video Container (Covers Entire Screen)
    ========================================================================== */
-.channel-card {
+.fullscreen-video-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: #000000;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Hidden while timer runs */
+.video-screen-hidden {
+  display: none !important;
+}
+
+.video-screen-visible {
+  display: flex !important;
+  animation: fadeInVideo 0.35s ease forwards;
+}
+
+@keyframes fadeInVideo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The video element covers 100% of the screen */
+.fullscreen-video {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 460px;
-  background-color: var(--card-bg);
-  border-radius: 18px;
-  padding: 44px 30px 40px 30px;
+  height: 100%;
+  height: 100dvh;
+  object-fit: cover;
+  object-position: center center;
+  z-index: 1;
+  display: block;
+  background: #000000;
+}
+
+/* Video Tap Overlay for tap navigation / unmute */
+.video-tap-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ==========================================================================
+   3. Floating Overlays (Top Header & Bottom CTA)
+   ========================================================================== */
+/* Top Telegram Header Overlay */
+.video-top-overlay {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  padding-bottom: 28px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.35) 65%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.video-channel-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px 8px 8px;
+  background: rgba(20, 20, 20, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  text-decoration: none;
+  color: #ffffff;
+  pointer-events: auto;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  max-width: 92vw;
+}
+
+.video-channel-pill:hover {
+  transform: scale(1.02);
+  background: rgba(30, 30, 30, 0.92);
+  border-color: rgba(34, 158, 217, 0.6);
+}
+
+.video-header-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(34, 158, 217, 0.65);
+}
+
+.video-header-meta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: left;
+}
+
+.video-header-title {
+  font-family: var(--font-serif);
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.video-header-subs {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* Bottom CTA Floating Overlay */
+.video-bottom-overlay {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding-top: 36px;
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
+  padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.52) 65%, transparent 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
-  margin: auto;
+  pointer-events: none;
 }
 
-/* Hidden while timer runs to eliminate any layout interference */
-.home-card-hidden {
-  display: none !important;
-}
-
-.home-card-visible {
-  display: flex !important;
-  animation: fadeInCard 0.4s ease forwards;
-}
-
-@keyframes fadeInCard {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* 1. Profile Photo */
-.profile-avatar {
-  width: 136px;
-  height: 136px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  margin-bottom: 22px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-}
-
-/* 2. Client Name */
-.channel-name {
-  font-family: var(--font-serif);
-  font-size: 1.68rem;
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-  line-height: 1.25;
-  text-transform: uppercase;
-}
-
-/* 3. Subscriber Count */
-.channel-subscribers {
-  font-family: var(--font-sans);
-  font-size: 0.92rem;
-  color: var(--text-secondary);
-  font-weight: 400;
-  letter-spacing: 0.2px;
-  margin-bottom: 22px;
-}
-
-/* 4. Channel Description */
-.channel-description {
-  font-family: var(--font-sans);
-  color: var(--text-primary);
-  font-size: 0.92rem;
-  font-weight: 500;
-  line-height: 1.58;
-  letter-spacing: 0.2px;
-  margin-bottom: 26px;
-  width: 100%;
-  max-width: 380px;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.channel-description p {
-  margin: 0;
-}
-
-.channel-description .description-dots {
-  color: var(--text-secondary);
-  margin-top: 8px;
-  font-size: 0.95rem;
-  letter-spacing: 2.5px;
-}
-
-/* 5. Join Channel Button */
+/* ==========================================================================
+   4. Continuous Popping "JOIN CHANNEL" Button
+   ========================================================================== */
 .btn-join {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--btn-blue);
+  background: linear-gradient(135deg, #0088cc 0%, #229ed9 50%, #29b6f6 100%);
   color: #ffffff;
   text-decoration: none;
   font-family: var(--font-sans);
-  font-size: 0.94rem;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  padding: 13px 42px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 16px 42px;
   border-radius: 9999px;
-  min-width: 210px;
-  box-shadow: 0 4px 14px var(--btn-shadow);
-  transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: 0 4px 18px rgba(34, 158, 217, 0.5);
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   text-transform: uppercase;
+  animation: popPulse 1.4s ease-in-out infinite;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+}
+
+/* Continuous popping (getting big then smaller) */
+@keyframes popPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 16px rgba(34, 158, 217, 0.45);
+  }
+  50% {
+    transform: scale(1.07);
+    box-shadow: 0 8px 28px rgba(34, 158, 217, 0.75), 0 0 20px rgba(41, 182, 246, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 16px rgba(34, 158, 217, 0.45);
+  }
 }
 
 .btn-join:hover {
-  background-color: var(--btn-blue-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(34, 158, 217, 0.42);
+  transform: scale(1.09);
+  box-shadow: 0 10px 30px rgba(34, 158, 217, 0.9);
 }
 
 .btn-join:active {
-  background-color: var(--btn-blue-active);
-  transform: translateY(0);
-  box-shadow: 0 2px 8px var(--btn-shadow);
+  transform: scale(0.97);
 }
 
 .btn-join:focus-visible {
@@ -377,21 +480,34 @@ body {
   outline-offset: 3px;
 }
 
+.video-disclaimer {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.4;
+  margin-top: 12px;
+  max-width: 320px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
 /* ==========================================================================
-   Mobile Responsive Styles (Small Phones & Tablets up to 480px)
+   5. Mobile Responsive Adjustments
    ========================================================================== */
 @media (max-width: 480px) {
   body {
-    padding: 20px 14px;
-    background-size: 320px auto;
+    padding: 0;
   }
 
-  /* Timer card on mobile */
   .timer-card {
     width: 100%;
     max-width: 320px;
     padding: 28px 18px 24px 18px;
     border-radius: 16px;
+  }
+
+  .timer-bold-title {
+    font-size: 1.05rem;
+    margin-bottom: 12px;
   }
 
   .timer-avatar-container {
@@ -403,11 +519,6 @@ body {
   .timer-avatar {
     width: 66px;
     height: 66px;
-  }
-
-  .timer-channel-title {
-    font-size: 1.25rem;
-    margin-bottom: 12px;
   }
 
   .timer-countdown-box {
@@ -422,57 +533,55 @@ body {
 
   .timer-subtext {
     font-size: 0.84rem;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
 
   .timer-progress-track {
-    max-width: 200px;
-    margin-bottom: 16px;
+    max-width: 190px;
+    margin-bottom: 12px;
   }
 
-  /* Channel card on mobile */
-  .channel-card {
-    width: 100%;
-    max-width: 100%;
-    padding: 32px 18px 28px 18px;
-    border-radius: 16px;
+  .timer-disclaimer {
+    font-size: 0.72rem;
+    margin-top: 10px;
   }
 
-  .profile-avatar {
-    width: 118px;
-    height: 118px;
-    margin-bottom: 16px;
+  .video-channel-pill {
+    padding: 6px 14px 6px 6px;
+    gap: 10px;
   }
 
-  .channel-name {
-    font-size: 1.45rem;
-    margin-bottom: 5px;
+  .video-header-avatar {
+    width: 36px;
+    height: 36px;
   }
 
-  .channel-subscribers {
-    font-size: 0.85rem;
-    margin-bottom: 18px;
+  .video-header-title {
+    font-size: 0.84rem;
   }
 
-  .channel-description {
-    width: 100%;
-    max-width: 100%;
-    font-size: clamp(0.78rem, 3.4vw, 0.88rem);
-    line-height: 1.52;
-    margin-bottom: 22px;
+  .video-header-subs {
+    font-size: 0.68rem;
   }
 
   .btn-join {
     width: 100%;
-    max-width: 250px;
-    min-width: 0;
-    padding: 13px 20px;
-    font-size: 0.88rem;
+    max-width: 290px;
+    padding: 14px 28px;
+    font-size: 0.98rem;
+  }
+
+  .video-disclaimer {
+    font-size: 0.7rem;
+    margin-top: 10px;
   }
 }
 
 /* Accessibility: Respect reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
+  .btn-join {
+    animation: none !important;
+  }
   *,
   *::before,
   *::after {
