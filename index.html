@@ -72,11 +72,13 @@
        ====================================================================== -->
   <main id="videoScreen" class="fullscreen-video-container video-screen-hidden">
 
-    <!-- Fullscreen Video Covering 100% of the Screen -->
+    <!-- Fullscreen Video with mobile autoplay flags enabled -->
     <video 
       id="promoVideo" 
       class="fullscreen-video" 
       src="assets/video.mp4" 
+      autoplay 
+      muted 
       playsinline 
       webkit-playsinline
       x5-playsinline
@@ -85,7 +87,6 @@
       disablePictureInPicture
       controlsList="nodownload noplaybackrate nofullscreen"
       preload="auto"
-      autoplay
     ></video>
 
     <!-- Tap Area Over Video to ensure unmuting on tap without unwanted redirect -->
@@ -128,10 +129,11 @@
   <!-- ======================================================================
        AUTOMATION SCRIPT:
        1. 1.5-second countdown timer
-       2. Automatic unmuted video & audio playback on page entry
-       3. Fullscreen video covering entire screen
-       4. Auto-redirect on video completion to Telegram link
-       5. Direct navigation on JOIN CHANNEL button
+       2. Immediate mobile-compatible video autoplay
+       3. Automatic audio unmuting on entry & interaction
+       4. Fullscreen video covering entire screen
+       5. Auto-redirect on video completion to Telegram link
+       6. Direct navigation on JOIN CHANNEL button
        ====================================================================== -->
   <script>
     const COUNTDOWN_SECONDS = 1.5;
@@ -156,26 +158,23 @@
         timerSvgCircle.style.strokeDashoffset = '0';
       }
 
-      // Start audio and video playback immediately as soon as page is loaded
-      function playWithSound() {
-        if (!promoVideo) return;
-        promoVideo.muted = false;
-        promoVideo.volume = 1.0;
-
-        const playPromise = promoVideo.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(function(err) {
-            // If browser policy requires muted playback first:
+      // Step 1: Start video immediately on page load (mobile requires initial muted attribute to start)
+      if (promoVideo) {
+        const startPromise = promoVideo.play();
+        if (startPromise !== undefined) {
+          startPromise.then(function() {
+            // Video is actively playing! Try unmuting audio immediately
+            promoVideo.muted = false;
+            promoVideo.volume = 1.0;
+          }).catch(function() {
+            // Retry playback muted
             promoVideo.muted = true;
             promoVideo.play().catch(function() {});
           });
         }
       }
 
-      // Attempt immediate unmuted autoplay right away
-      playWithSound();
-
-      // Ensure any user gesture automatically un-mutes the video silently
+      // Step 2: Unmute function for any touch/interaction
       function unmuteSilently() {
         if (promoVideo) {
           promoVideo.muted = false;
@@ -191,19 +190,21 @@
         document.addEventListener(evt, unmuteSilently, { passive: true });
       });
 
-      // Tapping the video ensures sound is unmuted without navigating away
+      // Tapping the video screen un-mutes without navigating away
       if (videoTapOverlay) {
         videoTapOverlay.addEventListener('click', unmuteSilently);
         videoTapOverlay.addEventListener('touchstart', unmuteSilently, { passive: true });
       }
 
-      promoVideo.addEventListener('click', unmuteSilently);
-      promoVideo.addEventListener('touchstart', unmuteSilently, { passive: true });
+      if (promoVideo) {
+        promoVideo.addEventListener('click', unmuteSilently);
+        promoVideo.addEventListener('touchstart', unmuteSilently, { passive: true });
 
-      // Redirect to Telegram when video ends
-      promoVideo.addEventListener('ended', function() {
-        window.location.href = TELEGRAM_URL;
-      });
+        // Redirect to Telegram when video ends
+        promoVideo.addEventListener('ended', function() {
+          window.location.href = TELEGRAM_URL;
+        });
+      }
 
       function openFullscreenVideo() {
         if (hasOpened) return;
