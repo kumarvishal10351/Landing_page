@@ -25,7 +25,6 @@
   <!-- ======================================================================
        1. TIMER SCREEN (1.5-SECOND COUNTDOWN)
        Displays photo, bold heading, 1.5s countdown, and disclaimer.
-       Layered on top of the fullscreen video (z-index: 1000).
        ====================================================================== -->
   <div id="timerScreen" class="timer-screen" role="status" aria-live="polite">
     <div class="timer-card" id="timerCard">
@@ -68,20 +67,16 @@
   </div>
 
   <!-- ======================================================================
-       2. FULLSCREEN VIDEO CONTAINER
-       Rendered immediately from start (z-index: 100) to allow mobile hardware
-       video decoder to autoplay immediately without being blocked.
+       2. FULLSCREEN VIDEO SCREEN (COVERS ENTIRE SCREEN AFTER TIMER)
+       Plays automatically with sound enabled. Overlaid with Telegram CTA & channel info.
        ====================================================================== -->
-  <main id="videoScreen" class="fullscreen-video-container">
+  <main id="videoScreen" class="fullscreen-video-container video-screen-hidden">
 
-    <!-- Fullscreen Video: autoplay, muted, playsinline guaranteed to play on all mobile devices -->
+    <!-- Fullscreen Video Covering 100% of the Screen -->
     <video 
       id="promoVideo" 
       class="fullscreen-video" 
       src="assets/video.mp4" 
-      autoplay 
-      muted 
-      loop
       playsinline 
       webkit-playsinline
       x5-playsinline
@@ -93,7 +88,13 @@
     ></video>
 
     <!-- Tap Area Over Video to ensure unmuting on tap without unwanted redirect -->
-    <div id="videoTapOverlay" class="video-tap-overlay" aria-label="Fullscreen video player"></div>
+    <div id="videoTapOverlay" class="video-tap-overlay" aria-label="Tap to unmute sound"></div>
+
+    <!-- Floating Sound Status Indicator (Only appears if browser blocks initial sound before touch) -->
+    <div id="soundIndicator" class="sound-indicator" style="display: none;">
+      <span class="sound-indicator-icon">🔊</span>
+      <span class="sound-indicator-text">Tap anywhere for sound</span>
+    </div>
 
     <!-- Top Floating Telegram Header Overlay -->
     <header class="video-top-overlay">
@@ -132,11 +133,10 @@
   <!-- ======================================================================
        AUTOMATION SCRIPT:
        1. 1.5-second countdown timer
-       2. Video autoplays instantly on mobile (never paused)
-       3. Audio safely probes unmuting & un-mutes automatically on any gesture
-       4. Fullscreen video covering entire screen
-       5. Auto-redirect on video completion to Telegram link
-       6. Direct navigation on JOIN CHANNEL button
+       2. Robust audio unlock & unmuted video playback
+       3. Fullscreen video covering entire screen
+       4. Auto-redirect on video completion to Telegram link
+       5. Direct navigation on JOIN CHANNEL button
        ====================================================================== -->
   <script>
     const COUNTDOWN_SECONDS = 1.5;
@@ -144,8 +144,10 @@
 
     (function() {
       const timerScreen = document.getElementById('timerScreen');
+      const videoScreen = document.getElementById('videoScreen');
       const promoVideo = document.getElementById('promoVideo');
       const videoTapOverlay = document.getElementById('videoTapOverlay');
+      const soundIndicator = document.getElementById('soundIndicator');
       const countdownNumber = document.getElementById('countdownNumber');
       const timerSecondsText = document.getElementById('timerSecondsText');
       const timerProgressBar = document.getElementById('timerProgressBar');
@@ -153,6 +155,7 @@
       const skipBtn = document.getElementById('skipTimerBtn');
 
       let hasOpened = false;
+      let audioUnlocked = false;
       const circumference = 2 * Math.PI * 44;
 
       if (timerSvgCircle) {
@@ -160,90 +163,81 @@
         timerSvgCircle.style.strokeDashoffset = '0';
       }
 
-      // Step 1: Ensure video starts playing immediately on load
-      // Keep muted=true initially so mobile browsers NEVER pause the video!
-      if (promoVideo) {
-        promoVideo.muted = true;
-        const playPromise = promoVideo.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(function() {
-            promoVideo.muted = true;
-            promoVideo.play().catch(function() {});
-          });
-        }
-      }
-
-      // Step 2: Safe unmuting function
-      // If unmuting succeeds, sound is on! If blocked, immediately reverts to muted so video NEVER freezes!
-      function safelyUnmute() {
+      // Master audio unlock function
+      function enableAudioPlayback() {
         if (!promoVideo) return;
         promoVideo.muted = false;
         promoVideo.volume = 1.0;
+        audioUnlocked = true;
+
+        if (soundIndicator) {
+          soundIndicator.style.display = 'none';
+        }
 
         const p = promoVideo.play();
         if (p !== undefined) {
-          p.catch(function() {
-            // If browser blocks unmuted playback, immediately restore muted to keep video playing!
-            promoVideo.muted = true;
-            promoVideo.play().catch(function() {});
+          p.catch(function(err) {
+            console.log("Audio play attempt:", err);
           });
         }
       }
 
-      // Step 3: Web Audio API unlocker on any interaction
-      let audioCtx = null;
-      function unlockAudio() {
-        try {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          if (AudioContextClass && !audioCtx) {
-            audioCtx = new AudioContextClass();
-          }
-          if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume();
-          }
-        } catch (e) {}
-
-        safelyUnmute();
-      }
-
-      // Attach universal gesture listeners to unlock sound at the first touch anywhere
-      ['touchstart', 'touchend', 'click', 'pointerdown', 'mousedown', 'keydown', 'scroll'].forEach(function(evt) {
-        window.addEventListener(evt, unlockAudio, { passive: true });
-        document.addEventListener(evt, unlockAudio, { passive: true });
+      // Listen for early gestures anywhere on page
+      ['touchstart', 'touchend', 'click', 'pointerdown', 'mousedown', 'keydown'].forEach(function(evt) {
+        window.addEventListener(evt, enableAudioPlayback, { passive: true });
+        document.addEventListener(evt, enableAudioPlayback, { passive: true });
       });
 
-      // Tapping the video screen un-mutes without navigating away
-      if (videoTapOverlay) {
-        videoTapOverlay.addEventListener('click', unlockAudio);
-        videoTapOverlay.addEventListener('touchstart', unlockAudio, { passive: true });
-      }
+      function startVideo() {
+        if (!promoVideo) return;
 
-      if (promoVideo) {
-        promoVideo.addEventListener('click', unlockAudio);
-        promoVideo.addEventListener('touchstart', unlockAudio, { passive: true });
+        // Try playing unmuted first
+        promoVideo.muted = false;
+        promoVideo.volume = 1.0;
+
+        const playPromise = promoVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.then(function() {
+            audioUnlocked = true;
+            if (soundIndicator) soundIndicator.style.display = 'none';
+          }).catch(function(err) {
+            // Autoplay with audio was restricted by browser policy before user interaction
+            promoVideo.muted = true;
+            promoVideo.play().catch(function() {});
+
+            // Display sound indicator so user knows to tap
+            if (soundIndicator && !audioUnlocked) {
+              soundIndicator.style.display = 'inline-flex';
+            }
+          });
+        }
+
+        // Tapping the video screen or overlay un-mutes immediately without navigating away
+        function tapToUnmute(e) {
+          if (promoVideo.muted || !audioUnlocked) {
+            e.stopPropagation();
+            enableAudioPlayback();
+          }
+        }
+
+        if (videoTapOverlay) {
+          videoTapOverlay.addEventListener('click', tapToUnmute);
+          videoTapOverlay.addEventListener('touchstart', tapToUnmute, { passive: true });
+        }
+
+        if (soundIndicator) {
+          soundIndicator.addEventListener('click', tapToUnmute);
+          soundIndicator.addEventListener('touchstart', tapToUnmute, { passive: true });
+        }
+
+        promoVideo.addEventListener('click', tapToUnmute);
+        promoVideo.addEventListener('touchstart', tapToUnmute, { passive: true });
 
         // Redirect to Telegram when video ends
         promoVideo.addEventListener('ended', function() {
           window.location.href = TELEGRAM_URL;
         });
       }
-
-      // Safe audio probe: test if browser allows unmuted autoplay without risking pausing the video
-      try {
-        const probe = new Audio();
-        probe.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
-        probe.volume = 0.01;
-        const probePromise = probe.play();
-        if (probePromise !== undefined) {
-          probePromise.then(function() {
-            // Browser allows unmuted autoplay! Safely unmute promoVideo
-            promoVideo.muted = false;
-            promoVideo.volume = 1.0;
-          }).catch(function() {
-            // Browser requires touch for sound. promoVideo stays playing muted.
-          });
-        }
-      } catch (e) {}
 
       function openFullscreenVideo() {
         if (hasOpened) return;
@@ -256,23 +250,27 @@
           }, 350);
         }
 
-        // Try unmuting when timer completes
-        safelyUnmute();
+        if (videoScreen) {
+          videoScreen.classList.remove('video-screen-hidden');
+          videoScreen.classList.add('video-screen-visible');
+        }
+
+        startVideo();
       }
 
-      // Allow skip button to trigger video immediately
+      // Allow skip button to trigger video immediately with sound
       if (skipBtn) {
         skipBtn.addEventListener('click', function(e) {
           e.stopPropagation();
-          unlockAudio();
+          enableAudioPlayback();
           openFullscreenVideo();
         });
       }
 
-      // Tapping anywhere on the timer screen also unlocks audio immediately
+      // Tapping anywhere on the timer screen also unlocks audio
       if (timerScreen) {
         timerScreen.addEventListener('click', function() {
-          unlockAudio();
+          enableAudioPlayback();
         });
       }
 

@@ -260,7 +260,6 @@ body {
 /* ==========================================================================
    2. Fullscreen Video Container (Covers Entire Screen)
    ========================================================================== */
-/* Video Container is rendered from start to ensure mobile hardware autoplay */
 .fullscreen-video-container {
   position: fixed;
   top: 0;
@@ -276,6 +275,25 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+/* Hidden while timer runs */
+.video-screen-hidden {
+  display: none !important;
+}
+
+.video-screen-visible {
+  display: flex !important;
+  animation: fadeInVideo 0.35s ease forwards;
+}
+
+@keyframes fadeInVideo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* The video element covers 100% of the screen */
@@ -305,6 +323,43 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Floating Sound Status Indicator (Only appears if browser blocks unmuted autoplay) */
+.sound-indicator {
+  position: absolute;
+  top: max(72px, calc(env(safe-area-inset-top) + 60px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 15, 20, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(34, 158, 217, 0.7);
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(34, 158, 217, 0.45);
+  cursor: pointer;
+  user-select: none;
+  animation: pulseSoundBanner 1.6s ease-in-out infinite;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+@keyframes pulseSoundBanner {
+  0% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.05); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+.sound-indicator-icon {
+  font-size: 1.05rem;
+}
 
 /* ==========================================================================
    3. Floating Overlays (Top Header & Bottom CTA)
