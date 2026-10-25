@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SURAJ BHAI - Telegram Channel</title>
+  <meta name="description" content="Join SURAJ BHAI on Telegram. PLAY CAREFULLY AND MAINTAIN YOUR LEVEL. ALWAYS FOR PROFITS. REGISTER LINK HERE.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="assets/profile.jpg">
+
+  <!-- Google Font for Heading (Bold Serif matching Telegram title styling) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ======================================================================
+       1. TIMER SCREEN (1-SECOND COUNTDOWN BEFORE HOME PAGE)
+       Displays for 1 second upon page load, then reveals the home page card.
+       ====================================================================== -->
+  <div id="timerScreen" class="timer-screen" role="status" aria-live="polite">
+    <div class="timer-card">
+      <div class="timer-avatar-container">
+        <img 
+          src="assets/profile.jpg" 
+          alt="SURAJ BHAI Avatar" 
+          class="timer-avatar" 
+          width="76" 
+          height="76"
+          loading="eager"
+        >
+        <svg class="timer-svg" viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="timer-svg-bg" cx="50" cy="50" r="44"></circle>
+          <circle id="timerSvgCircle" class="timer-svg-bar" cx="50" cy="50" r="44"></circle>
+        </svg>
+      </div>
+
+      <h2 class="timer-channel-title">SURAJ BHAI</h2>
+
+      <div class="timer-countdown-box">
+        <span id="countdownNumber" class="countdown-digit">1</span>
+      </div>
+
+      <p class="timer-subtext">Opening page in <span id="timerSecondsText">1</span> second...</p>
+
+      <div class="timer-progress-track">
+        <div id="timerProgressBar" class="timer-progress-fill"></div>
+      </div>
+
+      <button id="skipTimerBtn" class="timer-skip-btn" type="button" aria-label="Skip timer and open immediately">
+        Skip &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       2. HOME PAGE (TELEGRAM CHANNEL PREVIEW CARD)
+       Revealed automatically after the 3-second timer completes.
+
+       CONFIGURATION (EASY TO UPDATE):
+       - Profile Image: Update src in <img class="profile-avatar">
+       - Name: Update text inside <h1 class="channel-name">
+       - Subscriber Count: Update text inside <p class="channel-subscribers">
+       - Description: Update lines inside <div class="channel-description">
+       - Telegram Link: Update href in <a class="btn-join">
+       ====================================================================== -->
+  <main id="homeCard" class="channel-card home-card-hidden">
+
+    <!-- 1. Profile Photo -->
+    <img 
+      src="assets/profile.jpg" 
+      alt="SURAJ BHAI Profile Photo" 
+      class="profile-avatar"
+      width="136"
+      height="136"
+      loading="eager"
+    >
+
+    <!-- 2. Client Name -->
+    <h1 class="channel-name">SURAJ BHAI</h1>
+
+    <!-- 3. Subscriber Count -->
+    <p class="channel-subscribers">20 177 subscribers</p>
+
+    <!-- 4. Channel Description -->
+    <div class="channel-description">
+      <p>PLAY CAREFULLY AND MAINTAIN YOUR LEVEL</p>
+      <p>ALWAYS FOR PROFITS 🔥</p>
+      <p>REGISTER LINK HERE 🔥 ✨</p>
+      <p class="description-dots">...</p>
+    </div>
+
+    <!-- 5. Join Channel Button -->
+    <a 
+      href="https://t.me/+ycyTTk1Skik2MDg1" 
+      class="btn-join" 
+      target="_blank" 
+      rel="noopener noreferrer"
+    >
+      JOIN CHANNEL
+    </a>
+
+  </main>
+
+  <!-- ======================================================================
+       TIMER SCRIPT (Configurable 1-Second Countdown)
+       ====================================================================== -->
+  <script>
+    // Configurable duration (in seconds)
+    const COUNTDOWN_SECONDS = 1;
+
+    (function() {
+      const timerScreen = document.getElementById('timerScreen');
+      const homeCard = document.getElementById('homeCard');
+      const countdownNumber = document.getElementById('countdownNumber');
+      const timerSecondsText = document.getElementById('timerSecondsText');
+      const timerProgressBar = document.getElementById('timerProgressBar');
+      const timerSvgCircle = document.getElementById('timerSvgCircle');
+      const skipBtn = document.getElementById('skipTimerBtn');
+
+      let remaining = COUNTDOWN_SECONDS;
+      let hasOpened = false;
+      const circumference = 2 * Math.PI * 44; // ~276.46px for radius=44
+
+      if (timerSvgCircle) {
+        timerSvgCircle.style.strokeDasharray = circumference;
+        timerSvgCircle.style.strokeDashoffset = '0';
+      }
+
+      function openHomePage() {
+        if (hasOpened) return;
+        hasOpened = true;
+
+        if (timerScreen) {
+          timerScreen.classList.add('fade-out');
+          setTimeout(function() {
+            timerScreen.style.display = 'none';
+          }, 350);
+        }
+
+        if (homeCard) {
+          homeCard.classList.remove('home-card-hidden');
+          homeCard.classList.add('home-card-visible');
+        }
+      }
+
+      // Allow user to skip immediately if they click Skip
+      if (skipBtn) {
+        skipBtn.addEventListener('click', openHomePage);
+      }
+
+      // Start circular SVG ring and progress bar animations
+      requestAnimationFrame(function() {
+        if (timerProgressBar) {
+          timerProgressBar.style.transition = 'width ' + COUNTDOWN_SECONDS + 's linear';
+          timerProgressBar.style.width = '100%';
+        }
+
+        if (timerSvgCircle) {
+          timerSvgCircle.style.transition = 'stroke-dashoffset ' + COUNTDOWN_SECONDS + 's linear';
+          timerSvgCircle.style.strokeDashoffset = circumference;
+        }
+      });
+
+      // 1-second interval to update displayed countdown digit
+      const interval = setInterval(function() {
+        remaining -= 1;
+        if (remaining > 0) {
+          if (countdownNumber) {
+            countdownNumber.textContent = remaining;
+            countdownNumber.classList.remove('pulse');
+            void countdownNumber.offsetWidth; // retrigger pulse animation
+            countdownNumber.classList.add('pulse');
+          }
+          if (timerSecondsText) {
+            timerSecondsText.textContent = remaining;
+          }
+        } else {
+          clearInterval(interval);
+          if (countdownNumber) countdownNumber.textContent = '0';
+          if (timerSecondsText) timerSecondsText.textContent = '0';
+          openHomePage();
+        }
+      }, 1000);
+    })();
+  </script>
+
+</body>
+</html>

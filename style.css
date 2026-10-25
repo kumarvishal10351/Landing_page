@@ -1,0 +1,483 @@
+/* ==========================================================================
+   Telegram Channel Landing Page Stylesheet
+   - Minimal, lightweight, zero-dependency CSS
+   - High-fidelity match to Telegram channel preview
+   - 3-second animated countdown screen before home page
+   - Fully responsive and centered for mobile, tablet, and desktop
+   ========================================================================== */
+
+/* Design Tokens */
+:root {
+  --bg-color: #0b0e0f;
+  --card-bg: #202020;
+  --text-primary: #ffffff;
+  --text-secondary: #868c92;
+  --btn-blue: #229ed9;
+  --btn-blue-hover: #1e8ec3;
+  --btn-blue-active: #197eb0;
+  --btn-shadow: rgba(34, 158, 217, 0.28);
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Base Reset & Box Sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--bg-color);
+  background-image: url('assets/pattern.svg');
+  background-repeat: repeat;
+  background-position: center top;
+  background-size: 420px auto;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 16px;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   1. Timer / Countdown Screen (Initial 3 Seconds)
+   ========================================================================== */
+.timer-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background-color: var(--bg-color);
+  background-image: url('assets/pattern.svg');
+  background-repeat: repeat;
+  background-position: center top;
+  background-size: 420px auto;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  overflow-y: auto;
+}
+
+.timer-screen.fade-out {
+  opacity: 0;
+  transform: scale(0.96);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.timer-card {
+  width: 100%;
+  max-width: 360px;
+  background-color: var(--card-bg);
+  border-radius: 18px;
+  padding: 36px 24px 30px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  margin: auto;
+}
+
+.timer-avatar-container {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.timer-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.timer-svg-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 4;
+}
+
+.timer-svg-bar {
+  fill: none;
+  stroke: var(--btn-blue);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.timer-channel-title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timer-countdown-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(34, 158, 217, 0.12);
+  border: 1.5px solid rgba(34, 158, 217, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.countdown-digit {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--btn-blue);
+  font-family: var(--font-sans);
+  line-height: 1;
+}
+
+.countdown-digit.pulse {
+  animation: pulseDigit 0.28s ease;
+}
+
+@keyframes pulseDigit {
+  0% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.timer-subtext {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.timer-progress-track {
+  width: 100%;
+  max-width: 240px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.timer-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--btn-blue);
+  border-radius: 999px;
+}
+
+.timer-skip-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.timer-skip-btn:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.timer-skip-btn:focus-visible {
+  outline: 2px solid var(--btn-blue);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   2. Home Page / Main Channel Preview Card
+   ========================================================================== */
+.channel-card {
+  width: 100%;
+  max-width: 460px;
+  background-color: var(--card-bg);
+  border-radius: 18px;
+  padding: 44px 30px 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+  margin: auto;
+}
+
+/* Hidden while timer runs to eliminate any layout interference */
+.home-card-hidden {
+  display: none !important;
+}
+
+.home-card-visible {
+  display: flex !important;
+  animation: fadeInCard 0.4s ease forwards;
+}
+
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 1. Profile Photo */
+.profile-avatar {
+  width: 136px;
+  height: 136px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* 2. Client Name */
+.channel-name {
+  font-family: var(--font-serif);
+  font-size: 1.68rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* 3. Subscriber Count */
+.channel-subscribers {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  margin-bottom: 22px;
+}
+
+/* 4. Channel Description */
+.channel-description {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.58;
+  letter-spacing: 0.2px;
+  margin-bottom: 26px;
+  width: 100%;
+  max-width: 380px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.channel-description p {
+  margin: 0;
+}
+
+.channel-description .description-dots {
+  color: var(--text-secondary);
+  margin-top: 8px;
+  font-size: 0.95rem;
+  letter-spacing: 2.5px;
+}
+
+/* 5. Join Channel Button */
+.btn-join {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--btn-blue);
+  color: #ffffff;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  padding: 13px 42px;
+  border-radius: 9999px;
+  min-width: 210px;
+  box-shadow: 0 4px 14px var(--btn-shadow);
+  transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  text-transform: uppercase;
+}
+
+.btn-join:hover {
+  background-color: var(--btn-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(34, 158, 217, 0.42);
+}
+
+.btn-join:active {
+  background-color: var(--btn-blue-active);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px var(--btn-shadow);
+}
+
+.btn-join:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   Mobile Responsive Styles (Small Phones & Tablets up to 480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+  body {
+    padding: 20px 14px;
+    background-size: 320px auto;
+  }
+
+  /* Timer card on mobile */
+  .timer-card {
+    width: 100%;
+    max-width: 320px;
+    padding: 28px 18px 24px 18px;
+    border-radius: 16px;
+  }
+
+  .timer-avatar-container {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 12px;
+  }
+
+  .timer-avatar {
+    width: 66px;
+    height: 66px;
+  }
+
+  .timer-channel-title {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+  }
+
+  .timer-countdown-box {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+  }
+
+  .countdown-digit {
+    font-size: 1.6rem;
+  }
+
+  .timer-subtext {
+    font-size: 0.84rem;
+    margin-bottom: 14px;
+  }
+
+  .timer-progress-track {
+    max-width: 200px;
+    margin-bottom: 16px;
+  }
+
+  /* Channel card on mobile */
+  .channel-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 32px 18px 28px 18px;
+    border-radius: 16px;
+  }
+
+  .profile-avatar {
+    width: 118px;
+    height: 118px;
+    margin-bottom: 16px;
+  }
+
+  .channel-name {
+    font-size: 1.45rem;
+    margin-bottom: 5px;
+  }
+
+  .channel-subscribers {
+    font-size: 0.85rem;
+    margin-bottom: 18px;
+  }
+
+  .channel-description {
+    width: 100%;
+    max-width: 100%;
+    font-size: clamp(0.78rem, 3.4vw, 0.88rem);
+    line-height: 1.52;
+    margin-bottom: 22px;
+  }
+
+  .btn-join {
+    width: 100%;
+    max-width: 250px;
+    min-width: 0;
+    padding: 13px 20px;
+    font-size: 0.88rem;
+  }
+}
+
+/* Accessibility: Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
