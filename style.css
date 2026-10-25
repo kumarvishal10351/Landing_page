@@ -260,6 +260,7 @@ body {
 /* ==========================================================================
    2. Fullscreen Video Container (Covers Entire Screen)
    ========================================================================== */
+/* Video Container is rendered from start to ensure mobile hardware autoplay */
 .fullscreen-video-container {
   position: fixed;
   top: 0;
@@ -275,25 +276,6 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
-
-/* Hidden while timer runs */
-.video-screen-hidden {
-  display: none !important;
-}
-
-.video-screen-visible {
-  display: flex !important;
-  animation: fadeInVideo 0.35s ease forwards;
-}
-
-@keyframes fadeInVideo {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 /* The video element covers 100% of the screen */

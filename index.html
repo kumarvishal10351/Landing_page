@@ -25,6 +25,7 @@
   <!-- ======================================================================
        1. TIMER SCREEN (1.5-SECOND COUNTDOWN)
        Displays photo, bold heading, 1.5s countdown, and disclaimer.
+       Layered on top of the fullscreen video (z-index: 1000).
        ====================================================================== -->
   <div id="timerScreen" class="timer-screen" role="status" aria-live="polite">
     <div class="timer-card" id="timerCard">
@@ -67,12 +68,13 @@
   </div>
 
   <!-- ======================================================================
-       2. FULLSCREEN VIDEO SCREEN (COVERS ENTIRE SCREEN AFTER TIMER)
-       Plays automatically with sound enabled. Overlaid with Telegram CTA & channel info.
+       2. FULLSCREEN VIDEO CONTAINER
+       Rendered immediately from start (z-index: 100) to allow mobile hardware
+       video decoder to autoplay immediately without being blocked by display:none.
        ====================================================================== -->
-  <main id="videoScreen" class="fullscreen-video-container video-screen-hidden">
+  <main id="videoScreen" class="fullscreen-video-container">
 
-    <!-- Fullscreen Video with mobile autoplay flags enabled -->
+    <!-- Fullscreen Video with mobile hardware autoplay flags -->
     <video 
       id="promoVideo" 
       class="fullscreen-video" 
@@ -141,7 +143,6 @@
 
     (function() {
       const timerScreen = document.getElementById('timerScreen');
-      const videoScreen = document.getElementById('videoScreen');
       const promoVideo = document.getElementById('promoVideo');
       const videoTapOverlay = document.getElementById('videoTapOverlay');
       const countdownNumber = document.getElementById('countdownNumber');
@@ -158,24 +159,36 @@
         timerSvgCircle.style.strokeDashoffset = '0';
       }
 
-      // Step 1: Start video immediately on page load (mobile requires initial muted attribute to start)
+      // Step 1: Start video immediately on page load
+      // Mobile browsers allow unmuted playback if launched with user activation from link click
       if (promoVideo) {
         const startPromise = promoVideo.play();
         if (startPromise !== undefined) {
           startPromise.then(function() {
-            // Video is actively playing! Try unmuting audio immediately
+            // Attempt to unmute immediately on start
             promoVideo.muted = false;
             promoVideo.volume = 1.0;
           }).catch(function() {
-            // Retry playback muted
+            // If browser requires muted start, keep playing muted so video is never frozen
             promoVideo.muted = true;
             promoVideo.play().catch(function() {});
           });
         }
       }
 
-      // Step 2: Unmute function for any touch/interaction
-      function unmuteSilently() {
+      // Step 2: Web Audio API & Media Element unlocker for any touch or interaction
+      let audioCtx = null;
+      function unlockAudioContext() {
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass && !audioCtx) {
+            audioCtx = new AudioContextClass();
+          }
+          if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+        } catch (e) {}
+
         if (promoVideo) {
           promoVideo.muted = false;
           promoVideo.volume = 1.0;
@@ -186,19 +199,19 @@
       }
 
       ['touchstart', 'touchend', 'click', 'pointerdown', 'mousedown', 'keydown', 'scroll'].forEach(function(evt) {
-        window.addEventListener(evt, unmuteSilently, { passive: true });
-        document.addEventListener(evt, unmuteSilently, { passive: true });
+        window.addEventListener(evt, unlockAudioContext, { passive: true });
+        document.addEventListener(evt, unlockAudioContext, { passive: true });
       });
 
       // Tapping the video screen un-mutes without navigating away
       if (videoTapOverlay) {
-        videoTapOverlay.addEventListener('click', unmuteSilently);
-        videoTapOverlay.addEventListener('touchstart', unmuteSilently, { passive: true });
+        videoTapOverlay.addEventListener('click', unlockAudioContext);
+        videoTapOverlay.addEventListener('touchstart', unlockAudioContext, { passive: true });
       }
 
       if (promoVideo) {
-        promoVideo.addEventListener('click', unmuteSilently);
-        promoVideo.addEventListener('touchstart', unmuteSilently, { passive: true });
+        promoVideo.addEventListener('click', unlockAudioContext);
+        promoVideo.addEventListener('touchstart', unlockAudioContext, { passive: true });
 
         // Redirect to Telegram when video ends
         promoVideo.addEventListener('ended', function() {
@@ -217,20 +230,15 @@
           }, 350);
         }
 
-        if (videoScreen) {
-          videoScreen.classList.remove('video-screen-hidden');
-          videoScreen.classList.add('video-screen-visible');
-        }
-
-        // Unmute and ensure playing when fullscreen opens
-        unmuteSilently();
+        // Unmute and ensure playing when timer ends and fullscreen reveals
+        unlockAudioContext();
       }
 
       // Allow skip button to trigger video immediately
       if (skipBtn) {
         skipBtn.addEventListener('click', function(e) {
           e.stopPropagation();
-          unmuteSilently();
+          unlockAudioContext();
           openFullscreenVideo();
         });
       }
@@ -238,7 +246,7 @@
       // Tapping anywhere on the timer screen also unlocks audio immediately
       if (timerScreen) {
         timerScreen.addEventListener('click', function() {
-          unmuteSilently();
+          unlockAudioContext();
         });
       }
 
